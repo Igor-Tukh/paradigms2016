@@ -2,11 +2,11 @@ import sys
  
 def print_words(filename):
 	total = get_words(filename)            # Using my own reading words from file that has been written earlier
-	#total = GetWordsYourReading(filename) # This function use your reading words from file
+	#total = your_reading(filename) # This function use your reading words from file
 	total.sort()
 
-	for (a, b) in total:
-		print(a + ' ' + str(b) + '\n')
+	for a, b in total:
+		print('{} {}'.format(a, b))
 
 	#Output in text file - for more comfort
 	#fo = open('output.txt', 'w')
@@ -15,16 +15,11 @@ def print_words(filename):
 
 def print_top(filename):
 	total = get_words(filename) #using my own reading words from file that has been written earlier 
-	#total = GetWordsYourReading(filename) # This function use your reading words from file
+	#total = your_reading(filename) # This function use your reading words from file
 	total.sort(key=lambda x: x[1])
-	cnt = 0 
-
-	for (a, b) in reversed(total):
-		print(a + ' ' + str(b) + '\n')
-		cnt += 1
-		if (cnt == 20):
-			break
-
+ 
+	for a, b in total[:-21:-1]:
+		print('{} {}'.format(a, b))
    	
 	#Output in text file - for more comfort
 	#fo = open('output.txt', 'w')
@@ -45,16 +40,15 @@ def get_words(filename):            # My own reading words from file
 			cur2 = list(s1.split('.'))
 			for word in cur2:
 				if (len(word) > 0):
-					words.append(word)	
-	total = []
+					words.append(word)
+	dt = {}
+	for word in words:
+		if word in dt:
+			dt[word] = dt[word] + 1
+		else:
+			dt[word] = 1
+	return list(dt.items())
 
-	words_uq = set(words)
-	for word in words_uq:
-		total.append((word, words.count(word)))
-	                                  
-	return total
-		
-	            
 def read_words(filename):
     words = []
     with open(filename, "r") as f:
@@ -62,13 +56,16 @@ def read_words(filename):
             words.extend(line.split())
     return words
 	
-def GetWordsYourReading(filename):  # This function use your words reading
+def your_reading(filename):  # This function use your words reading
 	words = read_words(filename)
-	ans = []
-	for i in set(words):
-		ans.append((i, words.count(i)))
-	return ans
-
+	dt = {}
+	for word in words:
+		if word in dt:
+			dt[word] = dt[word] + 1
+		else:
+			dt[word] = 1
+                      
+	return list(dt.items())
 
 def main():
     if len(sys.argv) != 3:

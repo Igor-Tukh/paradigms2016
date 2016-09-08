@@ -1,7 +1,7 @@
 def verbing(s):
 	l = len(s)
-	if (l >= 3):
-		if (s[l-3:l:1] == 'ing'):
+	if l >= 3:
+		if (s[-3:] == 'ing'):
 			s += 'ly'
 		else:
 			s += 'ing'
