@@ -1,7 +1,6 @@
 import os
 import hashlib
 import argparse
-#import time
 
 def search(path):            
     global files_dict
@@ -32,11 +31,9 @@ def printing():
                 else:
                     print(name)
 
-#startime = round(time.time() * 1000)
 files_dict = {}
 parser = argparse.ArgumentParser()
 parser.add_argument('path', help = 'Root directory of the search local path')
 rootpath = parser.parse_args().path
 search(rootpath)
 printing()
-#print(round(time.time() * 1000)-startime)
