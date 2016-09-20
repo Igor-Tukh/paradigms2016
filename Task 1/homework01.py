@@ -1,39 +1,41 @@
 import os
 import hashlib
 import argparse
+from collections import defaultdict
 
-def search(path):            
-    global files_dict
-    cur_dir = os.walk(os.path.dirname(os.path.realpath(__file__)) + '\\' + path)
-    for rootdir, _, files in cur_dir:
-        for file in files:
-            if (file[0] != '.' and file[0] != '~'):
-                filepath = rootdir + '\\' + file
-                with open(filepath, 'r') as f:
-                    h = hashlib.sha1()
-                    s = f.read(5475).encode('utf-8')
-                    while (s):
-                        h.update(s)       
-                        s = f.read(5475).encode('utf-8') 
-                    next = h.hexdigest() 
-                    if (next in files_dict):
-                        files_dict[next].append(rootdir+'\\'+file)
-                    else:
-                        files_dict[next] = [rootdir+'\\'+file]
+def search_for_equal_files(path):            
+    for filepath in get_files(path): 
+        next = get_hash_of_file(filepath) 
+        files_dict[next].append(filepath)
 
-def printing():        
-    global files_dict
-    for hash in files_dict:
-        if (len(files_dict[hash]) > 1):
-            for ind, name in enumerate(files_dict[hash]):
-                if (ind - len(files_dict[hash]) + 1):
-                    print(name+':',end="")
-                else:
-                    print(name)
+def get_files(path):
+    file_list = []
+    for rootdir, _, files in os.walk(path):
+        for filepath in files:
+            if ((not os.path.islink(filepath)) and (not (filepath[0] == '~' or filepath[0] == '.'))):
+                file_list.append(os.path.join(rootdir, filepath))
 
-files_dict = {}
-parser = argparse.ArgumentParser()
-parser.add_argument('path', help = 'Root directory of the search local path')
-rootpath = parser.parse_args().path
-search(rootpath)
-printing()
+    return file_list
+
+def print_equal_files():      
+    for _, files in files_dict.items():
+        if (len(files) > 1):
+            print(':'.join(files))
+
+def get_hash_of_file(filepath):
+    with open(filepath, 'rb') as f:
+        h = hashlib.sha1()
+        s = f.read(5475)
+        while (s):
+            h.update(s)       
+            s = f.read(5475) 
+        return h.hexdigest()            
+    
+                
+if __name__ == "__main__":
+    files_dict = defaultdict(list)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', help = 'Root directory of the search path')
+    rootpath = parser.parse_args().path
+    search_for_equal_files(rootpath)
+    print_equal_files()
