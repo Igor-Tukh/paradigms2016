@@ -3,7 +3,7 @@ from math import log2
 
 def strassen(a, b):
     if a.shape[0] == 1:
-        return numpy.array([a[0][0] * b[0][0]], dtype = 'int')
+        return numpy.array([a[0][0] * b[0][0]])
     
     mid = a.shape[0] // 2
     
