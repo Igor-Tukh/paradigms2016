@@ -1,9 +1,10 @@
 import numpy
-from math import log2
+import sys
+from math import log2, ceil
 
 def strassen(a, b):
     if a.shape[0] == 1:
-        return numpy.array([a[0][0] * b[0][0]])
+        return a * b
     
     mid = a.shape[0] // 2
     
@@ -39,21 +40,16 @@ def strassen(a, b):
 if __name__ == "__main__":
     n = int(input())
     
-    pow2 = 1 << (int(log2(n)))
-    if (pow2 < n): pow2 *= 2
-    first = numpy.zeros( (pow2, pow2), dtype = 'int')
-    second = numpy.zeros(( pow2, pow2), dtype = 'int')
+    pow2 = 1 << (ceil(log2(n)))
+    first = numpy.zeros( (pow2, pow2), dtype = numpy.int)
+    second = numpy.zeros(( pow2, pow2), dtype = numpy.int)
     
-    for i in range(n):
-        val = numpy.array(list(map(int, input().split())))
-        first[i][0:n]=val.copy()
+    mat = numpy.loadtxt(sys.stdin, dtype = numpy.int, ndmin=2)
     
-    for i in range(n):
-        val = numpy.array(list(map(int, input().split())))
-        second[i][0:n]=val.copy()
+    first[:n,:n]=mat[:n]
+    second[:n,:n]=mat[n:]
     
     ans = strassen(first, second)
     
-    print("\nResult of multiplication:\n")
     for l in ans[:n]:
         print(' '.join(map(str, l[:n])))
