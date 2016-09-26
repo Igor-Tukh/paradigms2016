@@ -26,7 +26,7 @@ def strassen(a, b):
     s6 = strassen(a21 - a11, b11 + b12)
     s7 = strassen(a12 - a22, b21 + b22)
     
-    ans = numpy.zeros( (2 * mid, 2 * mid), dtype = 'int')
+    ans = numpy.zeros( (2 * mid, 2 * mid), dtype = numpy.int)
     
     ans[:mid, :mid] = s1 + s4 - s5 + s7
     ans[mid:, :mid] = s2 + s4
