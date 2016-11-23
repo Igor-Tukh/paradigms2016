@@ -6,8 +6,10 @@ void *consumer(void* data)
 {   
     ThreadPool_t* pool = (ThreadPool_t*) data;
 	struct wsqueue *queue = pool -> queue;
-    
+
+    pthread_mutex_lock(&queue->squeue.mutex);    
 	while (!pool->stop || queue_size(&queue->squeue.queue)) {
+	 	pthread_mutex_unlock(&queue->squeue.mutex);
 	 	struct list_node* node;
         
 		pthread_mutex_lock(&queue->squeue.mutex);
@@ -18,15 +20,17 @@ void *consumer(void* data)
 
 		if (node) {
 	    	Task_t* task = (Task_t*) node;
-	    	pthread_mutex_lock(&task->mutex);
+            pthread_mutex_lock(&task->mutex);
 			task->f(task->arg);
-		    task->stop = 1;  
-		    pthread_mutex_unlock(&task->mutex);
-		    pthread_cond_signal(&task->cond);  
-			free(node);
+		    task->stop = 1;
+		    pthread_cond_broadcast(&task->cond);  
+	        pthread_mutex_unlock(&task->mutex);
+//			free(node);
 		}
+		pthread_mutex_lock(&queue->squeue.mutex);
 	}
-
+    pthread_mutex_unlock(&queue->squeue.mutex);
+    
 	return NULL;
 }
 
@@ -46,8 +50,7 @@ void thpool_submit(ThreadPool_t* pool, Task_t* task){
 }
 
 void thpool_wait(Task_t* task){
-    pthread_mutex_lock(&task->mutex);
-        
+    pthread_mutex_lock(&task->mutex);    
     while (!task->stop)
         pthread_cond_wait(&task->cond, &task->mutex);
     
@@ -55,7 +58,10 @@ void thpool_wait(Task_t* task){
 }
 
 void thpool_finit(ThreadPool_t* pool){
-    pool->stop = 1;
+    pthread_mutex_lock(&pool->queue->squeue.mutex);
+    pool->stop = 1;    
+    pthread_cond_broadcast(&(pool->queue->cond)); 
+    pthread_mutex_unlock(&pool->queue->squeue.mutex);
     for(size_t i = 0; i < pool->cnt; i++)
         pthread_join(pool->threads[i], NULL);
     
