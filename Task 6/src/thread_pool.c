@@ -46,7 +46,7 @@ void thpool_init(ThreadPool_t* pool, size_t threads_nm){
 }
 
 void thpool_submit(ThreadPool_t* pool, Task_t* task){
-    wsqueue_push(pool->queue, &task->node);    
+    wsqueue_push(pool->queue, (struct list_node*) task);    
 }
 
 void thpool_wait(Task_t* task){
@@ -68,5 +68,5 @@ void thpool_finit(ThreadPool_t* pool){
     free(pool->threads);
     wsqueue_finit(pool->queue);
     free(pool->queue);
-    free(pool);   
+    //free(pool);   
 }
