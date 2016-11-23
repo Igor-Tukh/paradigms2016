@@ -26,4 +26,4 @@ bin/linkedlist.o: ./src/linkedlist.c include/linkedlist.h
 	gcc -c -g ./src/linkedlist.c -o ./bin/linkedlist.o -I include	
 
 clean:
-	rm -rf bin main
+	rm -rf bin pqsort

@@ -21,7 +21,14 @@ void swap(int* a, int* b){
 }
 
 int compar(const void* a, const void* b){
-    return *((int*)a) - *((int*)b);
+    int aa = *((int*)a);
+    int bb = *((int*)b);
+    if (aa < bb)
+        return -1;
+    else if (aa == bb)
+        return 0;
+    else
+        return 1;
 }
 
 void taskSort_init(TaskSort_t* task, ThreadPool_t* pool, int* data, size_t len, size_t depth){
@@ -93,14 +100,14 @@ void sorting(void* data){
     //printf("%d %d\n", lt, rt);
     Task_t* ltask = malloc(sizeof(Task_t));
     TaskSort_t* left = malloc(sizeof(TaskSort_t));
-    taskSort_init(left, task->pool, data, rt + 1, task->depth-1);
+    taskSort_init(left, task->pool, task->data, rt + 1, task->depth-1);
     task_init(ltask, sorting, left);
     task->leftTask = ltask;
     thpool_submit(task->pool, task->leftTask);
     
     Task_t* rtask = malloc(sizeof(Task_t));
     TaskSort_t* right = malloc(sizeof(TaskSort_t));
-    taskSort_init(right, task->pool, data + lt, task->size - lt, task->depth-1);
+    taskSort_init(right, task->pool, task->data + lt, task->size - lt, task->depth-1);
     task_init(rtask, sorting, right);
     task->rightTask = rtask;
     thpool_submit(task->pool, task->rightTask);
@@ -137,8 +144,10 @@ int main(int argc, char* argv[]){
     
     int* data = malloc(len * sizeof(int));
     srand(42);
-    for(int i = 0; i < len; i++)
+    for(int i = 0; i < len; i++){
         data[i] = rand();
+    //    printf("%d ", data[i]);
+    }
     
     ThreadPool_t pool;
     thpool_init(&pool, num);
