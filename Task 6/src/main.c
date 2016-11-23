@@ -34,7 +34,6 @@ void taskSort_init(TaskSort_t* task, ThreadPool_t* pool, int* data, size_t len, 
 }
 
 void task_init(Task_t* task, void (*f)(void *), void* arg){
-    task->node = malloc(sizeof(struct list_node));
     task->f = f;
     task->arg = arg;
     task->stop = 0;
@@ -67,28 +66,33 @@ void sorting(void* data){
     
     task->leftTask = malloc(sizeof(Task_t));
     TaskSort_t* left = malloc(sizeof(TaskSort_t));
-    taskSort_init(left, task-> pool, data, lt, task->depth-1);
+    taskSort_init(left, task-> pool, data, rt + 1, task->depth-1);
     task_init(task->leftTask, sorting, left);
     thpool_submit(task->pool, task->leftTask);
     
     task->rightTask = malloc(sizeof(Task_t));
     TaskSort_t* right = malloc(sizeof(TaskSort_t));
-    taskSort_init(right, task-> pool, data+rt, task->size - rt, task->depth-1);
+    taskSort_init(right, task-> pool, data+rt, task->size - lt, task->depth-1);
     task_init(task->rightTask, sorting, right);
     thpool_submit(task->pool, task->rightTask);
 }
 
 void wait_for_over(Task_t* task){
+    if (task == NULL)
+        return;
+    
     thpool_wait(task);
     Task_t* lt = ((TaskSort_t*)task->arg)->leftTask;
     Task_t* rt = ((TaskSort_t*)task->arg)->rightTask;
     
-    if (lt != NULL)   
+    if (lt)   
         wait_for_over(lt);
-    if (rt != NULL)
+    if (rt)
         wait_for_over(rt);
     
     free(task->arg);
+    pthread_mutex_destroy(&task->mutex);
+    pthread_cond_destroy(&task->cond);
     free(task);
 }
 
@@ -117,6 +121,7 @@ int main(int argc, char* argv[]){
     
     for(int i = 1; i < len; i++)
         assert(data[i] > data[i - 1]);
+    free(data);
     
-    printf("Array successfully sorted"); 
+    printf("Successfully sorted"); 
 }

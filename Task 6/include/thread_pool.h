@@ -5,7 +5,7 @@
 #include "../include/wsqueue.h"
 
 typedef struct Task{
-    struct list_node* node;
+    struct list_node node;
     void (*f)(void *);
     void* arg;
     pthread_mutex_t mutex;
@@ -18,7 +18,6 @@ typedef struct ThreadPool{
     pthread_t* threads;
     size_t cnt;
     int stop;
-    pthread_mutex_t mutex;
 } ThreadPool_t;
 
 void thpool_init(ThreadPool_t* pool, size_t threads_nm);
