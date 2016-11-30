@@ -217,9 +217,9 @@ def test_max():
     
 def test_read():
     scope = Scope()
-    Read('a').evaluate(scope)
-    Read('b').evaluate(scope)
-    cond = BinaryOperation(scope['a'], '+', scope['max'])
+    #Read('a').evaluate(scope)
+    #Read('b').evaluate(scope)
+    #cond = BinaryOperation(scope['a'], '+', scope['max'])
     
 if __name__ == '__main__':
     test()
