@@ -12,7 +12,6 @@ class Scope(object):
             return self.parent[item]
         else:
             raise Exception
-
     def __setitem__(self, key, value):
         self.dict[key] = value
 
